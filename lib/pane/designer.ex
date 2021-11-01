@@ -11,12 +11,12 @@ defmodule Pane.Designer do
 
     :wxSizer.add(main_sizer, search_input,
       flag: Bitwise.bor(:wx_const.expand(), :wx_const.all()),
-      border: 5,
+      border: 5
     )
 
     :wxSizer.add(main_sizer, results,
       flag: Bitwise.bor(:wx_const.expand(), :wx_const.all()),
-      border: 5,
+      border: 5
     )
 
     :wxWindow.setSizer(frame, main_sizer)

@@ -14,6 +14,7 @@ defmodule Pane.Application do
   def start(_type, _args) do
     # Order matters here - the gui is dependent on the agent being up
     children = [
+      {Pane.Cache, ["data.cache"]},
       Pane.Server
     ]
 

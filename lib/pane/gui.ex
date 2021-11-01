@@ -11,11 +11,8 @@ defmodule Pane.Gui do
   def init(_args \\ []) do
     {_wx, frame, state} = Pane.Designer.setup_gui(@title)
 
-    {:ok, cache_pid} = Pane.Cache.start_link("data.cache")
-    IO.inspect(cache_pid)
-    Task.start(fn -> Pane.Indexer.index(cache_pid, "C:/") end)
-
-    {frame, Map.put(state, :cache_pid, cache_pid)}
+    send(self(), :init_cache)
+    {frame, state}
   end
 
   defevent(
@@ -30,6 +27,7 @@ defmodule Pane.Gui do
 
     if String.length(search) != 0 do
       files = Pane.Cache.get_by_file_name(cache_pid, search)
+
       if !Enum.empty?(files) do
         :wxListBox.insertItems(results, files, 0)
       end
@@ -50,9 +48,16 @@ defmodule Pane.Gui do
     {:noreply, state}
   end
 
-  defp append_to_list_box(list, text) do
-    count = :wxListBox.getCount(list)
-    :ok = :wxListBox.insertItems(list, [text], count)
-    list
+  def handle_info(
+        :init_cache,
+        state
+      ) do
+    {name, cache_pid, _type, _list_of_something} =
+      Supervisor.which_children(Pane.Supervisor)
+      |> Enum.filter(fn {name, _, _, _} -> name == Pane.Cache end)
+      |> List.first()
+
+    Task.start(fn -> Pane.Indexer.index(cache_pid, "C:/") end)
+    {:noreply, Map.put(state, :cache_pid, cache_pid)}
   end
 end
