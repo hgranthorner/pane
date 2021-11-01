@@ -29,7 +29,7 @@ defmodule Pane.Gui do
       files = Pane.Cache.get_by_file_name(cache_pid, search)
 
       if !Enum.empty?(files) do
-        :wxListBox.insertItems(results, files, 0)
+        :wxListBox.insertItems(results, Enum.sort(files), 0)
       end
     end
 
@@ -52,7 +52,7 @@ defmodule Pane.Gui do
         :init_cache,
         state
       ) do
-    {name, cache_pid, _type, _list_of_something} =
+    {_name, cache_pid, _type, _list_of_something} =
       Supervisor.which_children(Pane.Supervisor)
       |> Enum.filter(fn {name, _, _, _} -> name == Pane.Cache end)
       |> List.first()

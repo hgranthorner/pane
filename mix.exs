@@ -10,7 +10,6 @@ defmodule Pane.MixProject do
       deps: deps(),
       releases: [
         gui: [
-          # include_executables_for: [:unix],
           applications: [pane: :permanent]
         ]
       ]

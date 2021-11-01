@@ -24,3 +24,9 @@ be found at [https://hexdocs.pm/pane](https://hexdocs.pm/pane).
 ```sh
 mix run --no-halt
 ```
+
+## Building
+
+```sh
+mix release
+```

@@ -7,20 +7,22 @@ defmodule Pane.Designer do
 
     search_input = :wxTextCtrl.new(frame, :wx_const.id_any())
     results = :wxListBox.new(frame, :wx_const.id_any())
-    main_sizer = :wxBoxSizer.new(:wx_const.vertical())
+    sizer = :wxBoxSizer.new(:wx_const.vertical())
 
-    :wxSizer.add(main_sizer, search_input,
+    :wxSizer.add(sizer, search_input,
       flag: Bitwise.bor(:wx_const.expand(), :wx_const.all()),
-      border: 5
+      border: 5,
+      proportion: 0
     )
 
-    :wxSizer.add(main_sizer, results,
+    :wxSizer.add(sizer, results,
       flag: Bitwise.bor(:wx_const.expand(), :wx_const.all()),
-      border: 5
+      border: 5,
+      proportion: 1
     )
 
-    :wxWindow.setSizer(frame, main_sizer)
-    :wxSizer.setSizeHints(main_sizer, frame)
+    :wxWindow.setSizer(frame, sizer)
+    :wxSizer.setSizeHints(sizer, frame)
 
     :wxTextCtrl.connect(
       search_input,
@@ -31,7 +33,7 @@ defmodule Pane.Designer do
     :wxFrame.show(frame)
 
     state = %{
-      sizer: main_sizer,
+      sizer: sizer,
       search_input: search_input,
       results: results
     }

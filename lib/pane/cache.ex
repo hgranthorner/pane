@@ -5,12 +5,15 @@ defmodule Pane.Cache do
   Starts a new cache.
   """
   def start_link(path) do
-    Agent.start_link(fn ->
-      {success?, data} = File.read(path)
+    {:ok, persistence_pid} = Pane.Persistence.start_link(path)
 
-      case success? do
-        :ok -> :erlang.binary_to_term(data)
-        _ -> []
+    Agent.start_link(fn ->
+      data = Pane.Persistence.get_cache(persistence_pid)
+      cond do
+        !Enum.empty?(data) -> 
+          %{persistence: persistence_pid, data: data}
+        true -> 
+          %{persistence: persistence_pid, data: MapSet.new()}
       end
     end)
   end
@@ -19,27 +22,32 @@ defmodule Pane.Cache do
   Gets results from the cache.
   """
   def get(cache) do
-    Agent.get(cache, fn data -> data end)
+    Agent.get(cache, fn %{data: data} -> data end)
   end
 
   def get(cache, search) when is_binary(search) do
-    Agent.get(cache, fn data ->
+    Agent.get(cache, fn %{data: data} ->
       Enum.filter(data, &String.contains?(&1, search))
+      |> MapSet.new
     end)
   end
 
   def get_by_file_name(cache, search) when is_binary(search) do
-    Agent.get(cache, fn data ->
+    Agent.get(cache, fn %{data: data} ->
       Enum.filter(data, fn x ->
         String.downcase(x)
         |> String.split("/")
         |> List.last()
         |> String.contains?(search)
       end)
+      |> MapSet.new
     end)
   end
 
   def put(cache, path) when is_binary(path) do
-    Agent.update(cache, &[path | &1])
+    Agent.update(cache, fn %{persistence: persistence, data: data} = state ->
+      Pane.Persistence.put(persistence, path)
+      Map.put(state, :data, MapSet.put(data, path))
+  end)
   end
 end
