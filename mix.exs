@@ -10,7 +10,7 @@ defmodule Pane.MixProject do
       deps: deps(),
       releases: [
         gui: [
-          include_executables_for: [:unix],
+          # include_executables_for: [:unix],
           applications: [pane: :permanent]
         ]
       ]
@@ -20,8 +20,9 @@ defmodule Pane.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
+      app: :pane,
       extra_applications: [:logger, :wx, :observer],
-      # mode: {Pane.Application, [nil, nil]}
+      mod: {Pane.Application, []}
     ]
   end
 

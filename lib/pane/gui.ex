@@ -2,16 +2,32 @@ defmodule Pane.Gui do
   @behaviour :wx_object
   use Pane.Macros
 
-  @title "Tasks"
+  @title "Pane"
 
   def start_link(_opts) do
     :wx_object.start_link(__MODULE__, [], [])
   end
 
   def init(_args \\ []) do
-    {_wx, frame, %{box: box} = state} = Pane.Designer.setup_gui(@title)
+    {_wx, frame, state} = Pane.Designer.setup_gui(@title)
 
-    {frame, state}
+    {:ok, cache_pid} = Pane.Cache.start_link("data.cache")
+    IO.inspect(cache_pid)
+    Task.start(fn -> Pane.Indexer.index(cache_pid, "C:/") end)
+
+    {frame, Map.put(state, :cache_pid, cache_pid)}
+  end
+
+  defevent(
+    :search_input,
+    :command_text_updated,
+    search_char_list,
+    %{cache_pid: cache_pid} = state
+  ) do
+    search = to_string(search_char_list)
+    IO.inspect(search)
+    IO.inspect(Pane.Cache.get_by_file_name(cache_pid, search))
+    {:noreply, state}
   end
 
   def handle_event({:wx, _, _, _, {:wxClose, :close_window}}, state) do
@@ -26,4 +42,9 @@ defmodule Pane.Gui do
     {:noreply, state}
   end
 
+  defp append_to_list_box(list, text) do
+    count = :wxListBox.getCount(list)
+    :ok = :wxListBox.insertItems(list, [text], count)
+    list
+  end
 end

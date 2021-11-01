@@ -5,12 +5,12 @@ defmodule Pane do
 
   @doc """
   Hello world.
-
+  
   ## Examples
-
+  
       iex> Pane.hello()
       :world
-
+  
   """
   def hello do
     :world

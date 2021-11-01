@@ -24,3 +24,7 @@ pane-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+
+*.sublime*
+*.cache
