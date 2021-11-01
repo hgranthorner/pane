@@ -24,7 +24,7 @@ defmodule PaneCacheTest do
 
   test "can search by file name" do
     file = ""
-    test_data = ["bin/thing", "lib/other_thing", "/usr/not_thing"]
+    test_data = ["other/thing", "bin/thing", "lib/other_thing", "/usr/not_thing"]
     {:ok, cache} = Pane.Cache.start_link(file)
 
     for x <- test_data do

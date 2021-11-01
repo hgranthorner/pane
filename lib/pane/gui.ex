@@ -22,11 +22,19 @@ defmodule Pane.Gui do
     :search_input,
     :command_text_updated,
     search_char_list,
-    %{cache_pid: cache_pid} = state
+    %{cache_pid: cache_pid, results: results} = state
   ) do
     search = to_string(search_char_list)
-    IO.inspect(search)
-    IO.inspect(Pane.Cache.get_by_file_name(cache_pid, search))
+
+    :wxListBox.clear(results)
+
+    if String.length(search) != 0 do
+      files = Pane.Cache.get_by_file_name(cache_pid, search)
+      if !Enum.empty?(files) do
+        :wxListBox.insertItems(results, files, 0)
+      end
+    end
+
     {:noreply, state}
   end
 
