@@ -79,7 +79,7 @@ defmodule Pane.Gui do
     @enter,
     %{selected_file: selected_file} = state
   ) do
-    System.cmd(selected_file, [])
+    Task.start(fn -> :os.cmd(String.to_charlist(selected_file)) end)
     {:noreply, state}
   end
 
