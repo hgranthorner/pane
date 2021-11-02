@@ -1,8 +1,6 @@
 defmodule Pane.Indexer do
   def index(cache_pid, path \\ "C:/") do
-    files = File.ls!(path)
-
-    for f <- files do
+    for f <- :file.list_dir_all(path) |> elem(1) do
       full_path =
         if String.last(path) != "/" and String.last(path) != "\\" do
           "#{path}/#{f}"
