@@ -3,6 +3,8 @@ defmodule Pane.Gui do
   use Pane.Macros
 
   @title "Pane"
+  @tab 9
+  @enter 13
 
   def start_link(_opts) do
     :wx_object.start_link(__MODULE__, [], [])
@@ -36,6 +38,33 @@ defmodule Pane.Gui do
     {:noreply, state}
   end
 
+  defkeyevent(
+    :search_input,
+    @tab,
+    %{results: results} = state
+  ) do
+    :wxWindow.setFocus(results)
+    {:noreply, state}
+  end
+
+  defkeyevent(
+    :search_input,
+    @enter,
+    %{results: results} = state
+  ) do
+    :wxWindow.setFocus(results)
+    {:noreply, state}
+  end
+
+  defkeyevent(
+    :results,
+    @tab,
+    %{search_input: search_input} = state
+  ) do
+    :wxWindow.setFocus(search_input)
+    {:noreply, state}
+  end
+
   def handle_event({:wx, _, _, _, {:wxClose, :close_window}}, state) do
     {:stop, :normal, state}
   end
@@ -44,7 +73,14 @@ defmodule Pane.Gui do
         thing,
         state
       ) do
-    IO.inspect(thing)
+    type = elem(thing, 4) |> elem(0)
+    # A lot of these are going to trickle through,
+    # since we're only watching for certain values.
+    # We probably don't want to see all of those showing up
+    # in the console, but it might be useful sometimes.
+    if type != :wxKey do
+      IO.inspect(thing) 
+    end
     {:noreply, state}
   end
 
@@ -59,5 +95,10 @@ defmodule Pane.Gui do
 
     Task.start(fn -> Pane.Indexer.index(cache_pid, "C:/") end)
     {:noreply, Map.put(state, :cache_pid, cache_pid)}
+  end
+
+  def handle_info(any, state) do
+    IO.inspect(any, label: "Unknown info")
+    state
   end
 end

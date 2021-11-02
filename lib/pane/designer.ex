@@ -30,6 +30,18 @@ defmodule Pane.Designer do
       userData: :search_input
     )
 
+    :wxTextCtrl.connect(
+      search_input,
+      :key_up,
+      userData: :search_input
+    )
+
+    :wxListBox.connect(
+      results,
+      :key_up,
+      userData: :results
+    )
+
     :wxFrame.show(frame)
 
     state = %{

@@ -25,4 +25,15 @@ defmodule Pane.Macros do
           do: unquote(block)
     end
   end
+
+  defmacro defkeyevent(userData, key_code, state_destruct, do: block) do
+    quote do
+      def handle_event(
+            {:wx, _, _, unquote(userData),
+             {:wxKey, :key_up, _, _, unquote(key_code), _, _, _, _, _, _, _}},
+            unquote(state_destruct)
+          ),
+          do: unquote(block)
+    end
+  end
 end
