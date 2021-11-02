@@ -33,12 +33,13 @@ defmodule Pane.Cache do
   end
 
   def get_by_file_name(cache, search) when is_binary(search) do
+    down_search = String.downcase(search)
     Agent.get(cache, fn %{data: data} ->
       Enum.filter(data, fn x ->
         String.downcase(x)
         |> String.split("/")
         |> List.last()
-        |> String.contains?(search)
+        |> String.contains?(down_search)
       end)
       |> MapSet.new
     end)

@@ -48,4 +48,23 @@ defmodule PaneCacheTest do
              "lib/other_thing"
            ])
   end
+
+  test "is case insensitive" do
+    file = "cache_insensitive.cache"
+    test_data = MapSet.new(["egg", "Egg", "bob"])
+    
+    {:ok, cache} = Pane.Cache.start_link(file)
+
+    for x <- test_data do
+      Pane.Cache.put(cache, x)
+    end
+
+    assert Pane.Cache.get_by_file_name(cache, "e") == MapSet.new([
+             "egg", "Egg"
+           ])
+
+    assert Pane.Cache.get_by_file_name(cache, "E") == MapSet.new([
+             "egg", "Egg"
+           ])
+  end
 end
