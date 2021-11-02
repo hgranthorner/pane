@@ -22,6 +22,7 @@ defmodule Pane.Designer do
     )
 
     :wxWindow.setSizer(frame, sizer)
+    :wxSizer.setItemMinSize(sizer, results, 400, 400)
     :wxSizer.setSizeHints(sizer, frame)
 
     :wxTextCtrl.connect(
@@ -39,6 +40,12 @@ defmodule Pane.Designer do
     :wxListBox.connect(
       results,
       :key_up,
+      userData: :results
+    )
+
+    :wxListBox.connect(
+      results,
+      :command_listbox_selected,
       userData: :results
     )
 

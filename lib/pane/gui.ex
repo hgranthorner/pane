@@ -38,6 +38,15 @@ defmodule Pane.Gui do
     {:noreply, state}
   end
 
+  defevent(
+    :results,
+    :command_listbox_selected,
+    text,
+    state
+  ) do
+    {:noreply, Map.put(state, :selected_file, to_string(text))}
+  end
+
   defkeyevent(
     :search_input,
     @tab,
@@ -62,6 +71,15 @@ defmodule Pane.Gui do
     %{search_input: search_input} = state
   ) do
     :wxWindow.setFocus(search_input)
+    {:noreply, state}
+  end
+
+  defkeyevent(
+    :results,
+    @enter,
+    %{selected_file: selected_file} = state
+  ) do
+    System.cmd(selected_file, [])
     {:noreply, state}
   end
 
