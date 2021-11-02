@@ -18,8 +18,12 @@ defmodule Pane.Persistence do
 		GenServer.call(pid, :get)
 	end
 
-	def put(pid, file) do
+	def put(pid, file) when is_binary(file) do
 		GenServer.cast(pid, {:save, file})
+	end
+
+	def put(pid, files) when is_list(files) do
+		GenServer.cast(pid, {:save_many, files})
 	end
 
 	@impl true
@@ -36,6 +40,16 @@ defmodule Pane.Persistence do
 		files = read_file(path)
 		if !MapSet.member?(files, file) do
 			:ok = File.write!(path, :erlang.term_to_binary(MapSet.put(files, file)))
+		end
+		{:noreply, state}
+	end
+
+	@impl true
+	def handle_cast({:save_many, files}, %{path: path} = state) do
+		file_set = MapSet.new(files)
+		cached_files = read_file(path)
+		if !MapSet.subset?(file_set, cached_files) do
+			:ok = File.write!(path, :erlang.term_to_binary(MapSet.union(cached_files, file_set)))
 		end
 		{:noreply, state}
 	end

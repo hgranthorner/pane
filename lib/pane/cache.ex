@@ -49,6 +49,14 @@ defmodule Pane.Cache do
     Agent.update(cache, fn %{persistence: persistence, data: data} = state ->
       Pane.Persistence.put(persistence, path)
       Map.put(state, :data, MapSet.put(data, path))
-  end)
+    end)
+  end
+
+  def put(cache, paths) when is_list(paths) do
+    Agent.update(cache, fn %{persistence: persistence, data: data} = state ->
+      Pane.Persistence.put(persistence, paths)
+      path_set = MapSet.new(paths)
+      Map.put(state, :data, MapSet.union(data, MapSet.new(paths)))
+    end)
   end
 end

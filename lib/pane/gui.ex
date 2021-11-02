@@ -106,12 +106,13 @@ defmodule Pane.Gui do
         :init_cache,
         state
       ) do
-    {_name, cache_pid, _type, _list_of_something} =
+    cache_pid =
       Supervisor.which_children(Pane.Supervisor)
       |> Enum.filter(fn {name, _, _, _} -> name == Pane.Cache end)
       |> List.first()
+      |> elem(1)
 
-    Task.start(fn -> Pane.Indexer.index(cache_pid, "C:/") end)
+    Task.start(fn -> Pane.Indexer.index_batched(cache_pid, "C:/") end)
     {:noreply, Map.put(state, :cache_pid, cache_pid)}
   end
 
